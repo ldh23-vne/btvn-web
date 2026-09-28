@@ -8,6 +8,7 @@ Bài tập về nhà môn Lập trình web:
 
 Bài tập 1:
 
+
 1. giả lập linux os: hyperV, virtualBox, vmware, wsl
 
 Cài máy chủ linux trên vmware
