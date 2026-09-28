@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Sinh viên - Hưng 1</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            padding: 30px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 650px;
+        }
+        h2 {
+            color: #007bff;
+            margin-top: 0;
+            text-align: center;
+        }
+        .btn-fetch {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 20px;
+            transition: 0.3s;
+        }
+        .btn-fetch:hover { background-color: #218838; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #dee2e6;
+            padding: 12px;
+            text-align: left;
+        }
+        th { background-color: #007bff; color: white; }
+        tr:nth-child(even) { background-color: #f8f9fa; }
+        .loading { text-align: center; color: #6c757d; display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>🎓 Danh Sách Sinh Viên TNUT</h2>
+        <button class="btn-fetch" onclick="loadData()">Tải Dữ Liệu API Node-RED</button>
+        
+        <div id="loading" class="loading">Đang tải dữ liệu từ API...</div>
+
+        <table id="studentTable" style="display: none;">
+            <thead>
+                <tr>
+                    <th>Mã SV</th>
+                    <th>Họ và Tên</th>
+                    <th>Lớp</th>
+                    <th>Điểm TB</th>
+                </tr>
+            </thead>
+            <tbody id="studentData">
+                <!-- Dữ liệu JS sẽ được chèn vào đây -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Hàm JavaScript gọi API bằng Fetch
+        async function loadData() {
+            const loading = document.getElementById('loading');
+            const table = document.getElementById('studentTable');
+            const tbody = document.getElementById('studentData');
+
+            loading.style.display = 'block';
+            table.style.display = 'none';
+            tbody.innerHTML = '';
+
+            try {
+                // Gọi API thông qua Proxy Nginx
+                const response = await fetch('/api/danhsach-sv');
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    // Lặp qua danh sách trả về từ JSON
+                    result.data.forEach(sv => {
+                        const row = `
+                            <tr>
+                                <td><b>${sv.masv}</b></td>
+                                <td>${sv.name}</td>
+                                <td>${sv.class}</td>
+                                <td><span style="color: green; font-weight: bold;">${sv.score}</span></td>
+                            </tr>
+                        `;
+                        tbody.innerHTML += row;
+                    });
+
+                    loading.style.display = 'none';
+                    table.style.display = 'table';
+                }
+            } catch (error) {
+                loading.innerText = '❌ Lỗi không thể gọi API: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
